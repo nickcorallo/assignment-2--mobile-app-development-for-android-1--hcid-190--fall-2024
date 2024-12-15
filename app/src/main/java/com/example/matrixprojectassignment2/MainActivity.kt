@@ -137,6 +137,14 @@ class MainActivity : ComponentActivity() {
             return outputBuilder.toString()
         }
     }
+    private fun generateDefaultMatrix(matrix: Array<IntArray>): String {
+        val size = matrix.size
+        val maxNumber = size * size
+        val width = maxNumber.toString().length - 2
+        val outputBuilder = StringBuilder()
+
+        for ((rowIndex, row) in matrix.withIndex()) {
+            for ((columnIndex, value) in row
 
 
 
