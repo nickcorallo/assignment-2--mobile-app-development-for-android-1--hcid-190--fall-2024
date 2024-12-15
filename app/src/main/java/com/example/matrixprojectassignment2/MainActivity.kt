@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.matrixprogram.ui.theme.MatrixProgramTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -144,7 +143,7 @@ class MainActivity : ComponentActivity() {
         val outputBuilder = StringBuilder()
 
         for ((rowIndex, row) in matrix.withIndex()) {
-            for ((columnIndex, value) in row
+            for ((columnIndex, value) in row)
                 for ((columnIndex, value) in row.withIndex()) {
                     val isDiagonalElement = columnIndex == size - 1 - rowIndex
                     outputBuilder.append(
@@ -184,6 +183,45 @@ class MainActivity : ComponentActivity() {
         }
         return outputBuilder.toString()
     }
+    private fun generateFlippedMatrix(matrix: Array<IntArray>): String {
+        val size = matrix.size
+        val outputBuilder = StringBuilder()
+        val maxNumber = size * size
+        val width = maxNumber.toString().length - 2
+
+        for (rowIndex in 0 until size) {
+            for (columnIndex in 0 until size) {
+                val isDiagonalElement = columnIndex == size - 1 - rowIndex
+
+                // If it's a diagonal element, keep its original value
+                val value = if (isDiagonalElement) {
+                    "RED_${(rowIndex * size + columnIndex + 1)}" // Mark diagonal values
+                } else {
+                    (maxNumber - (rowIndex * size + columnIndex)).toString()
+                }
+
+                outputBuilder.append(value.padStart(width) + " ")
+            }
+            outputBuilder.append("\n")
+        }
+        return outputBuilder.toString()
+    }
+}
+
+private operator fun Int.component2(): Any {
+
+    return TODO("Provide the return value")
+}
+
+class MatrixProgramTheme(function: @Composable () -> Unit) {
+
+}
+
+private operator fun Int.component1(): Any {
+
+    return TODO("Provide the return value")
+}
+
 
 
 
