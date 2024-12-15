@@ -145,6 +145,21 @@ class MainActivity : ComponentActivity() {
 
         for ((rowIndex, row) in matrix.withIndex()) {
             for ((columnIndex, value) in row
+                for ((columnIndex, value) in row.withIndex()) {
+                    val isDiagonalElement = columnIndex == size - 1 - rowIndex
+                    outputBuilder.append(
+                        if (isDiagonalElement) {
+                            "RED_$value".padStart(width)  // Mark diagonal numbers
+                        } else {
+                            value.toString().padStart(width)
+                        }
+                    )
+                    outputBuilder.append(" ")
+                }
+            outputBuilder.append("\n")
+        }
+        return outputBuilder.toString()
+    }
 
 
 
