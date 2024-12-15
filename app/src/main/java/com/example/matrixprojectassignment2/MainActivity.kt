@@ -118,4 +118,25 @@ class MainActivity : ComponentActivity() {
             MatrixDisplay(matrixSize, generatedMatrix)
         }
     }
+    private fun createMatrix(size: Int): String {
+        if (size <= 0) {
+            return "Invalid matrix size"
+        } else {
+            val matrix = Array(size) { IntArray(size) { 0 } }
+            val outputBuilder = StringBuilder()
+
+            outputBuilder.append("Default Matrix:\n")
+            outputBuilder.append(generateDefaultMatrix(matrix))
+
+            outputBuilder.append("Numbered Matrix:\n")
+            outputBuilder.append(generateNumberedMatrix(matrix))
+
+            outputBuilder.append("Flipped Matrix:\n")
+            outputBuilder.append(generateFlippedMatrix(matrix))
+
+            return outputBuilder.toString()
+        }
+    }
+
+
 
