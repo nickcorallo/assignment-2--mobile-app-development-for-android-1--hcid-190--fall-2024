@@ -160,6 +160,30 @@ class MainActivity : ComponentActivity() {
         }
         return outputBuilder.toString()
     }
+    private fun generateNumberedMatrix(matrix: Array<IntArray>): String {
+        val size = matrix.size
+        var count = 1
+        val maxNumber = size * size
+        val width = maxNumber.toString().length - 2
+        val outputBuilder = StringBuilder()
+
+        for (rowIndex in 0 until size) {
+            for (columnIndex in 0 until size) {
+                val isDiagonalElement = columnIndex == size - 1 - rowIndex
+                outputBuilder.append(
+                    if (isDiagonalElement) {
+                        "RED_$count".padStart(width)  // Mark diagonal numbers
+                    } else {
+                        count.toString().padStart(width)
+                    }
+                )
+                count++
+                outputBuilder.append(" ")
+            }
+            outputBuilder.append("\n")
+        }
+        return outputBuilder.toString()
+    }
 
 
 
