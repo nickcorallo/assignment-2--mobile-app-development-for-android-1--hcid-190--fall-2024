@@ -1,81 +1,131 @@
-package com.example.matrixprogram
+
+package com.example.matrixprojectassignment2
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             MatrixProgramTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            DisplayTitle(title = "Matrix Program")
-                            Spacer(modifier = Modifier.height(16.dp))
-                            MatrixInputSection()
-                        }
-                    }
+                    MatrixApp()
                 }
             }
         }
     }
+
+    @Composable
+    fun MatrixApp() {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DisplayTitle(title = "Matrix Program")
+                Spacer(modifier = Modifier.height(16.dp))
+                MatrixInputSection()
+            }
+        }
+    }
+
+    @Composable
+    fun DisplayTitle(title: String) {
+        Text(
+            text = title,
+            fontSize = 24.sp,
+            fontFamily = FontFamily.SansSerif,
+            textAlign = TextAlign.Center
+        )
+    }
+
+    @Composable
+    fun MatrixInputSection() {
+        var inputText by remember { mutableStateOf("") }
+        var matrixSize by remember { mutableStateOf(0) }
+        var generatedMatrix by remember { mutableStateOf("") }
+        var errorMessage by remember { mutableStateOf("") }
+
+        TextField(
+            value = inputText,
+            onValueChange = {
+                inputText = it
+                matrixSize = it.toIntOrNull() ?: 0
+                errorMessage = if (matrixSize <= 0) "Please enter a positive integer." else ""
+            },
+            label = { Text("Enter matrix size") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            if (matrixSize > 0) {
+                generatedMatrix = createMatrix(matrixSize)
+                errorMessage = ""
+            } else {
+                errorMessage = "Please enter a valid matrix size."
+            }
+        }) {
+            Text("Generate Matrix")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (errorMessage.isNotEmpty()) {
+            Text(text = errorMessage, color = Color.Red)
+        } else if (generatedMatrix.isNotEmpty()) {
+            MatrixDisplay(matrixSize, generatedMatrix)
+        }
+    }
+
     @Composable
     fun MatrixDisplay(matrixSize: Int, matrixContent: String) {
         val fontSize = if (matrixSize >= 12) 12.sp else 16.sp
         val matrixRows = matrixContent.split("\n").filter { it.isNotEmpty() }
 
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            for ((rowIndex, rowContent) in matrixRows.withIndex()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+        ) {
+            for (rowContent in matrixRows) {
                 Row(
                     modifier = Modifier
                         .padding(4.dp)
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    val elements = rowContent.trim().split(" ")
-                    for ((columnIndex, element) in elements.withIndex()) {
+                    val elements = rowContent.split(" ")
+                    for (element in elements) {
                         val isDiagonalElement = element.startsWith("RED_")
                         Text(
-                            text = element.removePrefix("RED_").trim(),
+                            text = element.removePrefix("RED_"),
                             color = if (isDiagonalElement) Color.Red else Color.Black,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 1.dp),
+                            modifier = Modifier.weight(1f),
                             textAlign = TextAlign.Center,
                             fontSize = fontSize,
                             fontFamily = FontFamily.SansSerif
@@ -85,143 +135,67 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    @Composable
-    fun DisplayTitle(title: String, modifier: Modifier = Modifier) {
-        Text(text = title, modifier = modifier)
-    }
 
-    @Composable
-    fun MatrixInputSection() {
-        var inputText by remember { mutableStateOf("") }
-        var matrixSize by remember { mutableStateOf(0) }
-        var generatedMatrix by remember { mutableStateOf("") }
-
-        TextField(
-            value = inputText,
-            onValueChange = {
-                inputText = it
-                matrixSize = it.toIntOrNull() ?: 0
-            },
-            label = { Text("Enter a number") }
-        )
-
-        Button(onClick = {
-            generatedMatrix = createMatrix(matrixSize)
-        }) {
-            Text("Generate Matrix")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (generatedMatrix.isNotEmpty()) {
-            MatrixDisplay(matrixSize, generatedMatrix)
-        }
-    }
     private fun createMatrix(size: Int): String {
         if (size <= 0) {
             return "Invalid matrix size"
-        } else {
-            val matrix = Array(size) { IntArray(size) { 0 } }
-            val outputBuilder = StringBuilder()
-
-            outputBuilder.append("Default Matrix:\n")
-            outputBuilder.append(generateDefaultMatrix(matrix))
-
-            outputBuilder.append("Numbered Matrix:\n")
-            outputBuilder.append(generateNumberedMatrix(matrix))
-
-            outputBuilder.append("Flipped Matrix:\n")
-            outputBuilder.append(generateFlippedMatrix(matrix))
-
-            return outputBuilder.toString()
         }
-    }
-    private fun generateDefaultMatrix(matrix: Array<IntArray>): String {
-        val size = matrix.size
-        val maxNumber = size * size
-        val width = maxNumber.toString().length - 2
-        val outputBuilder = StringBuilder()
 
-        for ((rowIndex, row) in matrix.withIndex()) {
-            for ((columnIndex, value) in row)
-                for ((columnIndex, value) in row.withIndex()) {
-                    val isDiagonalElement = columnIndex == size - 1 - rowIndex
-                    outputBuilder.append(
-                        if (isDiagonalElement) {
-                            "RED_$value".padStart(width)  // Mark diagonal numbers
-                        } else {
-                            value.toString().padStart(width)
-                        }
-                    )
-                    outputBuilder.append(" ")
-                }
-            outputBuilder.append("\n")
-        }
-        return outputBuilder.toString()
+        val defaultMatrix = generateDefaultMatrix(size)
+        val numberedMatrix = generateNumberedMatrix(size)
+        val flippedMatrix = generateFlippedMatrix(size)
+
+        return "Default Matrix:\n$defaultMatrix\n" +
+                "Numbered Matrix:\n$numberedMatrix\n" +
+                "Flipped Matrix:\n$flippedMatrix"
     }
-    private fun generateNumberedMatrix(matrix: Array<IntArray>): String {
-        val size = matrix.size
+
+    private fun generateDefaultMatrix(size: Int): String {
+        val builder = StringBuilder()
+        for (row in 0 until size) {
+            for (col in 0 until size) {
+                val value = if (row + col == size - 1) "RED_0" else "0"
+                builder.append(value).append(" ")
+            }
+            builder.append("\n")
+        }
+        return builder.toString()
+    }
+
+    private fun generateNumberedMatrix(size: Int): String {
+        val builder = StringBuilder()
         var count = 1
-        val maxNumber = size * size
-        val width = maxNumber.toString().length - 2
-        val outputBuilder = StringBuilder()
-
-        for (rowIndex in 0 until size) {
-            for (columnIndex in 0 until size) {
-                val isDiagonalElement = columnIndex == size - 1 - rowIndex
-                outputBuilder.append(
-                    if (isDiagonalElement) {
-                        "RED_$count".padStart(width)  // Mark diagonal numbers
-                    } else {
-                        count.toString().padStart(width)
-                    }
-                )
+        for (row in 0 until size) {
+            for (col in 0 until size) {
+                val value = if (row + col == size - 1) "RED_$count" else "$count"
+                builder.append(value).append(" ")
                 count++
-                outputBuilder.append(" ")
             }
-            outputBuilder.append("\n")
+            builder.append("\n")
         }
-        return outputBuilder.toString()
+        return builder.toString()
     }
-    private fun generateFlippedMatrix(matrix: Array<IntArray>): String {
-        val size = matrix.size
-        val outputBuilder = StringBuilder()
+
+    private fun generateFlippedMatrix(size: Int): String {
+        val builder = StringBuilder()
         val maxNumber = size * size
-        val width = maxNumber.toString().length - 2
-
-        for (rowIndex in 0 until size) {
-            for (columnIndex in 0 until size) {
-                val isDiagonalElement = columnIndex == size - 1 - rowIndex
-
-                // If it's a diagonal element, keep its original value
-                val value = if (isDiagonalElement) {
-                    "RED_${(rowIndex * size + columnIndex + 1)}" // Mark diagonal values
-                } else {
-                    (maxNumber - (rowIndex * size + columnIndex)).toString()
-                }
-
-                outputBuilder.append(value.padStart(width) + " ")
+        var count = maxNumber
+        for (row in 0 until size) {
+            for (col in 0 until size) {
+                val value = if (row + col == size - 1) "RED_$count" else "$count"
+                builder.append(value).append(" ")
+                count--
             }
-            outputBuilder.append("\n")
+            builder.append("\n")
         }
-        return outputBuilder.toString()
+        return builder.toString()
     }
 }
 
-private operator fun Int.component2(): Any {
-
-    return TODO("Provide the return value")
+@Composable
+fun MatrixProgramTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = lightColorScheme(),
+        content = content
+    )
 }
-
-class MatrixProgramTheme(function: @Composable () -> Unit) {
-
-}
-
-private operator fun Int.component1(): Any {
-
-    return TODO("Provide the return value")
-}
-
-
-
-
