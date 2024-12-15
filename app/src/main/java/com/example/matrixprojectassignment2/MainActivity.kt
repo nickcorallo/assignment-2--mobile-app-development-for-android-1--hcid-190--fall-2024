@@ -55,3 +55,34 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    @Composable
+    fun MatrixDisplay(matrixSize: Int, matrixContent: String) {
+        val fontSize = if (matrixSize >= 12) 12.sp else 16.sp
+        val matrixRows = matrixContent.split("\n").filter { it.isNotEmpty() }
+
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            for ((rowIndex, rowContent) in matrixRows.withIndex()) {
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val elements = rowContent.trim().split(" ")
+                    for ((columnIndex, element) in elements.withIndex()) {
+                        val isDiagonalElement = element.startsWith("RED_")
+                        Text(
+                            text = element.removePrefix("RED_").trim(),
+                            color = if (isDiagonalElement) Color.Red else Color.Black,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 1.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = fontSize,
+                            fontFamily = FontFamily.SansSerif
+                        )
+                    }
+                }
+            }
+        }
+    }
