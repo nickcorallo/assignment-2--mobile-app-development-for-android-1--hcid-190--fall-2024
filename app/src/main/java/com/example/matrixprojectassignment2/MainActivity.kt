@@ -86,3 +86,36 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    @Composable
+    fun DisplayTitle(title: String, modifier: Modifier = Modifier) {
+        Text(text = title, modifier = modifier)
+    }
+
+    @Composable
+    fun MatrixInputSection() {
+        var inputText by remember { mutableStateOf("") }
+        var matrixSize by remember { mutableStateOf(0) }
+        var generatedMatrix by remember { mutableStateOf("") }
+
+        TextField(
+            value = inputText,
+            onValueChange = {
+                inputText = it
+                matrixSize = it.toIntOrNull() ?: 0
+            },
+            label = { Text("Enter a number") }
+        )
+
+        Button(onClick = {
+            generatedMatrix = createMatrix(matrixSize)
+        }) {
+            Text("Generate Matrix")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (generatedMatrix.isNotEmpty()) {
+            MatrixDisplay(matrixSize, generatedMatrix)
+        }
+    }
+
